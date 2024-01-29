@@ -15,4 +15,4 @@ use App\Http\Controllers\API;
 |
 */
 
-Route::get('/', [API\TestController::class, 'index']);
+Route::post('/test', [API\TestController::class, 'index']);
