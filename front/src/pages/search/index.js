@@ -9,7 +9,7 @@ export default function Test() {
     const formData = new FormData(e.target);
     const { q, maxResults } = Object.fromEntries(formData);
 
-    const response = await fetch("http://localhost/api/test", {
+    const response = await fetch("http://localhost/api/search", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

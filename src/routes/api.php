@@ -15,4 +15,4 @@ use App\Http\Controllers\API;
 |
 */
 
-Route::post('/test', [API\TestController::class, 'index']);
+Route::post('/search', [API\SearchController::class, 'index']);

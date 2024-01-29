@@ -9,12 +9,13 @@ use SpotifyWebAPI\SpotifyWebAPI;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
-class TestController extends Controller
+class SearchController extends Controller
 {
     public function index(Request $request)
     {
         $limit = $request->input('maxResults');
         $q = $request->input('q');
+
         // YouTube Data API v3
         $youtubeClient = new Google_Client();
         $youtubeClient->setDeveloperKey(env('GOOGLE_DEVELOPER_KEY'));
