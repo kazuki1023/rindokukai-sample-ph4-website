@@ -17,48 +17,60 @@ export default function Test() {
       body: JSON.stringify({ q, maxResults }),
     });
     const data = await response.json();
-    
+
     setYoutubeData(data.youtubeResults.items);
     setSpotifyData(data.spotifyResults);
   };
 
   return (
-    <main className="text-red-500">
-      <h1>Test</h1>
-      <form className="flex flex-col" onSubmit={handleSubmit}>
-        <label>
-          検索キーワード:
-          <input type="text" name="q" />
-        </label>
-        <label>
-          最大表示件数:
-          <input type="number" name="maxResults" />
-        </label>
-        <button type="submit">OK!</button>
+    <main className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-4">Search Results</h1>
+      <form className="mb-8" onSubmit={handleSubmit}>
+        <div className="flex flex-col lg:flex-row gap-2">
+          <label className="mb-2">
+            Search Keyword:
+            <input type="text" name="q" className="text-black	border ml-2 p-2 rounded-md"/>
+          </label>
+          <label className="mb-2">
+            Max Results:
+            <input type="number" name="maxResults" className="text-black border ml-2 p-2 rounded-md"/>
+          </label>
+        </div>
+        <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700">
+          Search
+        </button>
       </form>
-      <div>
-        <p>動画：</p>
-        {youtubeData.map((video) => {
-          return (
-            <div key={video.etag}>
-              <h2 className="text-red-500">{video.snippet.title}</h2>
-              <iframe
-                src={"https://www.youtube.com/embed/" + video.id.videoId}
-                title={video.snippet.title}
-              ></iframe>
+      <div className="container mx-auto p-4 flex flex-col lg:flex-row">
+        <div className="lg:w-1/4">
+          <h2 className="text-xl font-bold mb-2">Music:</h2>
+          {spotifyData.map((track) => (
+            <div key={track.id} className="mb-4">
+              <h3 className="text-lg font-semibold mb-2">{track.name}</h3>
+              <a href={track.external_urls.spotify} className="text-blue-500 hover:underline" target="_blank">
+                Listen on Spotify
+              </a>
             </div>
-          );
-        })}
-      </div>
-      <div>
-        <p>音楽：</p>
-        {spotifyData.map((track) => {
-          return (
-            <div key={track.id}>
-              <h3>{track.name}</h3>
-            </div>
-          );
-        })}
+          ))}
+        </div>
+        <div className="lg:w-3/4">
+          <h2 className="text-xl font-bold mb-2">Videos:</h2>
+          <div className="flex flex-wrap -mx-2">
+            {youtubeData.map((video) => (
+              <div key={video.etag} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/3 px-2 mb-4" >
+                <h3 className="text-lg font-semibold mb-2">{video.snippet.title}</h3>
+                <div className="aspect-w-16 aspect-h-9">
+                  <iframe
+                    src={"https://www.youtube.com/embed/" + video.id.videoId}
+                    title={video.snippet.title}
+                    className="w-full h-full rounded-md"
+                    frameBorder="0"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </main>
   );
