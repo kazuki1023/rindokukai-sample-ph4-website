@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function Test() {
+export default function Search() {
   const [youtubeData, setYoutubeData] = useState([]);
   const [spotifyData, setSpotifyData] = useState([]);
 
@@ -17,8 +17,6 @@ export default function Test() {
       body: JSON.stringify({ q, maxResults }),
     });
     const data = await response.json();
-
-    console.log(data.spotifyResults);
 
     setYoutubeData(data.youtubeResults.items);
     setSpotifyData(data.spotifyResults);

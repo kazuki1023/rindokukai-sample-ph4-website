@@ -16,3 +16,4 @@ use App\Http\Controllers\API;
 */
 
 Route::post('/search', [API\SearchController::class, 'index']);
+Route::get('/trending', [API\TrendingController::class, 'index']);
