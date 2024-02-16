@@ -1,30 +1,69 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import { handleLogout } from "../../utils/authUtils";
 
 export default function Trending() {
+  const router = useRouter();
+  const [username, setUsername] = useState("");
   const [youtubeTrending, setTrendingYoutube] = useState([]);
   const [spotifyTrending, setTrendingSpotify] = useState([]);
 
   useEffect(() => {
+    const name = localStorage.getItem("username");
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
     const fetchTrendingData = async () => {
-      const response = await fetch("http://localhost/api/trending", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      try {
+        const response = await fetch("http://localhost/api/trending", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      const data = await response.json();
-      console.log(data);
+        if (response.status === 401) {
+          router.push("/login");
+          return;
+        }
 
-      setTrendingYoutube(data.youtubeTrending);
-      setTrendingSpotify(data.spotifyTrending);
+        const data = await response.json();
+        console.log(data);
+
+        setTrendingYoutube(data.youtubeTrending);
+        setTrendingSpotify(data.spotifyTrending);
+      } catch (error) {
+        console.error("Failed to fetch trending data", error);
+      }
     };
 
     fetchTrendingData();
+    setUsername(name);
   }, []);
 
   return (
     <main className="container mx-auto p-4">
+      <div className="flex justify-between items-center mb-4">
+        {username ? (
+          <div>
+            <p className="text-lg font-semibold">Welcome, {username}!</p>
+            <button
+              className="text-blue-500 hover:underline cursor-pointer"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </div>
+        ) : (
+          <Link href="/login" className="text-lg font-semibold"></Link>
+        )}
+      </div>
       <h1 className="text-3xl font-bold mb-4">Trending Now:</h1>
       <div className="container mx-auto p-4 flex flex-col lg:flex-row">
         <div className="lg:w-1/3">

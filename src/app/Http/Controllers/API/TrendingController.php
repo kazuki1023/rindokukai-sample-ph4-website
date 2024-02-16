@@ -50,18 +50,7 @@ class TrendingController extends Controller
         $spotifyApi->setAccessToken($accessToken);
 
         // Spotifyのトレンディングトラック取得
-        // $spotifyTrending = $spotifyApi->getFeaturedPlaylists(['limit' => 1])->playlists[0]->tracks->items;
-        // $spotifyTrending = $spotifyApi->getFeaturedPlaylists(['limit' => 1])->playlists->items;
         $spotifyTrending = $spotifyApi->getFeaturedPlaylists()->playlists->items;
-
-        // dd($spotifyTrending);
-
-        // $transformedData = collect($spotifyTrending)->map(function ($item) {
-        //     return [
-        //         'id' => $item->track->id,
-        //         'title' => $item->track->name,
-        //     ];
-        // })->toArray();
 
         return response()->json([
             'youtubeTrending' => $youtubeTrending,

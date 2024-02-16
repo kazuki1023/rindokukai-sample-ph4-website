@@ -50,11 +50,10 @@ class SearchController extends Controller
         $spotifyApi = new SpotifyWebAPI();
         $spotifyApi->setAccessToken($accessToken);
 
-
         $options = ([
             'limit' => $limit,
         ]);
-        
+
         $spotifyTracks = $spotifyApi->search(
             $request->input('q'),
             'track',
