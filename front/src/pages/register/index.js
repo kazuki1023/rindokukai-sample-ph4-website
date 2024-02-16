@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 export default function Register() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -42,7 +44,7 @@ export default function Register() {
 
       const data = await response.json();
       console.log("Registration successful:", data);
-      window.location.href = "/login";
+      router.push("/login");
     } catch (error) {
       console.error("Registration error:", error);
     }

@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 export default function Login() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -43,7 +45,7 @@ export default function Login() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('username', data.name);
 
-      window.location.href = "/trending";
+      router.push('/top');
     } catch (error) {
       console.error("Error:", error);
     }
