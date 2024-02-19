@@ -1,10 +1,13 @@
 import { useRouter } from "next/router";
 
-export const handleLogout = () => {
+export const useHandleLogout = () => {
   const router = useRouter();
-  // ログアウト処理を行い、必要に応じてトークンやユーザー情報をクリア
-  localStorage.removeItem('token');
-  localStorage.removeItem('username');
-  // ログインページにリダイレクト
-  router.push('/login');
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    router.push('/login');
+  };
+
+  return handleLogout;
 };

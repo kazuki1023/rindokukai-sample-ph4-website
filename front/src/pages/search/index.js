@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/router'
 import Link from "next/link";
-import { handleLogout } from "../../utils/authUtils";
+import { useHandleLogout } from "../../utils/authUtils";
 
 export default function Search() {
   const router = useRouter();
@@ -71,7 +71,6 @@ export default function Search() {
       .getElementById("searchForm")
       .addEventListener("submit", formSubmitHandler);
 
-    // setUsername を実行
     setUsername(name);
 
     // コンポーネントがアンマウントされるときにイベントリスナーを削除
@@ -81,6 +80,8 @@ export default function Search() {
         .removeEventListener("submit", formSubmitHandler);
     };
   }, [setUsername]);
+
+  const handleLogout = useHandleLogout();
 
   return (
     <main className="container mx-auto p-4">
@@ -150,7 +151,7 @@ export default function Search() {
           <div className="flex flex-wrap -mx-2">
             {youtubeData.map((video) => (
               <div
-                key={video.etag}
+                key={video.id.videoId}
                 className="w-full sm:w-1/2 md:w-1/3 lg:w-1/3 px-2 mb-4"
               >
                 <h3 className="text-lg font-semibold mb-2">

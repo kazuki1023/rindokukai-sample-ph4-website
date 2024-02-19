@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { handleLogout } from "../../utils/authUtils";
+import { useHandleLogout } from "../../utils/authUtils";
 
 export default function Trending() {
   const router = useRouter();
@@ -47,6 +47,8 @@ export default function Trending() {
     setUsername(name);
   }, []);
 
+  const handleLogout = useHandleLogout();
+
   return (
     <main className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-4">
@@ -89,7 +91,7 @@ export default function Trending() {
           <div className="flex flex-wrap -mx-2">
             {youtubeTrending.map((video) => (
               <div
-                key={video.etag}
+                key={video.id}
                 className="w-full sm:w-1/2 md:w-1/3 lg:w-1/3 px-2 mb-4"
               >
                 <h3 className="text-lg font-semibold mb-2">
