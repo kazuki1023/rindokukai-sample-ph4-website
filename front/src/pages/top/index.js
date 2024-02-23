@@ -8,14 +8,14 @@ export default function TopPage() {
   const [username, setUsername] = useState("");
 
   useEffect(() => {
-    const name = localStorage.getItem("username");
-    const token = localStorage.getItem("token");
+    // const name = localStorage.getItem("username");
+    // const token = localStorage.getItem("token");
 
-    if (!token) {
-      router.push("/login");
-    }
+    // if (!token) {
+    //   router.push("/login");
+    // }
 
-    setUsername(name);
+    // setUsername(name);
   }, []);
 
   return (

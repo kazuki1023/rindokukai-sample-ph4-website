@@ -13,7 +13,7 @@ export default function Search() {
     e.preventDefault();
 
     // CSRFトークンを取得
-    await fetch("http://localhost:80/sanctum/csrf-cookie", {
+    await fetch("http://localhost/sanctum/csrf-cookie", {
       method: "GET",
       credentials: "include",
     });

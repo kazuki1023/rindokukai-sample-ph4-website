@@ -1,53 +1,63 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import axios from "axios";
 
 export default function Register() {
   const router = useRouter();
   const [name, setName] = useState("");
+  const [conf_password, setPasswordConf] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // CSRFトークンを取得
-    await fetch("http://localhost:80/sanctum/csrf-cookie", {
-      method: "GET",
-      credentials: "include",
-    });
-
-    // XSRF-TOKEN クッキーからトークン値を取得
-    const xsrfToken = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("XSRF-TOKEN="))
-      .split("=")[1];
-
-    try {
-      const response = await fetch("http://localhost/api/register", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          // CSRF トークンをヘッダーに追加
-          "X-XSRF-TOKEN": decodeURIComponent(xsrfToken),
-        },
-        body: JSON.stringify({
-          name: name,
-          email: email,
-          password: password,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Something went wrong with the registration");
-      }
-
-      const data = await response.json();
-      console.log("Registration successful:", data);
-      router.push("/login");
-    } catch (error) {
-      console.error("Registration error:", error);
+    // XSRF-TOKENの値をCookieから取得する関数
+    function getCookieValue(name) {
+      let matches = document.cookie.match(
+        new RegExp(
+          "(?:^|; )" +
+            name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1") +
+            "=([^;]*)"
+        )
+      );
+      return matches ? decodeURIComponent(matches[1]) : undefined;
     }
+
+    axios
+      .get("http://localhost/sanctum/csrf-cookie", { withCredentials: true })
+      .then(async (response) => {
+        console.log("CSRF token fetched:", response);
+
+        try {
+          // ユーザー登録のPOSTリクエスト
+          const registrationResponse = await axios.post(
+            "http://localhost/register",
+            {
+              name: name,
+              email: email,
+              password: password,
+              password_confirmation: conf_password,
+            },
+            {
+              withCredentials: true,
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                "X-XSRF-TOKEN": getCookieValue("XSRF-TOKEN"),
+              },
+            }
+          );
+
+          console.log("Registration successful:", registrationResponse);
+          router.push("/login");
+        } catch (registrationError) {
+          console.error("Registration error:", registrationError);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to fetch CSRF token:", error);
+      });
   };
 
   return (
@@ -76,16 +86,28 @@ export default function Register() {
           onChange={(e) => setEmail(e.target.value)}
         />
       </div>
-      <div className="mb-6">
-        <label htmlFor="password" className="block text-sm font-bold mb-2">
+      <div className="mb-4">
+        <label htmlFor="password" className="block text-sm font-bold">
           Password:
         </label>
         <input
           type="password"
           id="password"
           value={password}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+      <div className="mb-6">
+        <label htmlFor="conf_password" className="block text-sm font-bold mb-2">
+          Confirm Password:
+        </label>
+        <input
+          type="password"
+          id="conf_password"
+          value={conf_password}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+          onChange={(e) => setPasswordConf(e.target.value)}
         />
       </div>
       <div className="flex items-center justify-center">

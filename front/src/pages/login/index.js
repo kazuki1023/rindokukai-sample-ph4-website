@@ -1,54 +1,48 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import axios from "axios";
 
 export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const performLogin = async () => {
-    try {
-      // CSRFトークンを取得
-      await fetch("http://localhost/sanctum/csrf-cookie", {
-        method: "GET",
-        credentials: "include",
+  // XSRF-TOKENの値をCookieから取得する関数
+  function getCookieValue(name) {
+    let matches = document.cookie.match(
+      new RegExp(
+        "(?:^|; )" +
+          name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1") +
+          "=([^;]*)"
+      )
+    );
+    return matches ? decodeURIComponent(matches[1]) : undefined;
+  }
+
+  const performLogin = () => {
+    axios
+      .get("http://localhost/sanctum/csrf-cookie", { withCredentials: true })
+      .then(() => {
+        return axios.post(
+          "http://localhost/login",
+          {
+            email: email,
+            password: password,
+          },
+          {
+            withCredentials: true,
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+              "X-XSRF-TOKEN": getCookieValue("XSRF-TOKEN"),
+            },
+          }
+        );
+      })
+      .then((response) => {
+        console.log("Login successful:", response);
+        router.push("/top");
       });
-
-      // XSRF-TOKEN クッキーからトークン値を取得
-      const xsrfToken = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("XSRF-TOKEN="))
-        .split("=")[1];
-
-      // ログイン処理
-      const loginResponse = await fetch("http://localhost/api/login", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": decodeURIComponent(xsrfToken),
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
-      });
-
-      if (!loginResponse.ok) {
-        console.error("Login failed");
-        return; // ログインに失敗した場合、ここで処理を終了
-      }
-
-      const data = await loginResponse.json();
-      console.log("Login successful:", data);
-
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('username', data.name);
-
-      router.push('/top');
-    } catch (error) {
-      console.error("Error:", error);
-    }
   };
 
   return (
