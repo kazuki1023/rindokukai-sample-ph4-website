@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import axios from "axios";
+import myAxios from "../../utils/axios";
 
 export default function Register() {
   const router = useRouter();
@@ -12,52 +12,23 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // XSRF-TOKENの値をCookieから取得する関数
-    function getCookieValue(name) {
-      let matches = document.cookie.match(
-        new RegExp(
-          "(?:^|; )" +
-            name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1") +
-            "=([^;]*)"
-        )
-      );
-      return matches ? decodeURIComponent(matches[1]) : undefined;
-    }
+    try {
+      // CSRFトークンを取得するためのGETリクエスト
+      await myAxios.get("http://localhost/sanctum/csrf-cookie");
 
-    axios
-      .get("http://localhost/sanctum/csrf-cookie", { withCredentials: true })
-      .then(async (response) => {
-        console.log("CSRF token fetched:", response);
-
-        try {
-          // ユーザー登録のPOSTリクエスト
-          const registrationResponse = await axios.post(
-            "http://localhost/register",
-            {
-              name: name,
-              email: email,
-              password: password,
-              password_confirmation: conf_password,
-            },
-            {
-              withCredentials: true,
-              headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-                "X-XSRF-TOKEN": getCookieValue("XSRF-TOKEN"),
-              },
-            }
-          );
-
-          console.log("Registration successful:", registrationResponse);
-          router.push("/login");
-        } catch (registrationError) {
-          console.error("Registration error:", registrationError);
-        }
-      })
-      .catch((error) => {
-        console.error("Failed to fetch CSRF token:", error);
+      // ユーザー登録のPOSTリクエスト
+      const registrationResponse = await myAxios.post("http://localhost/register", {
+        name: name,
+        email: email,
+        password: password,
+        password_confirmation: conf_password,
       });
+
+      console.log("Registration successful:", registrationResponse);
+      router.push("/login"); 
+    } catch (error) {
+      console.error("Registration error:", error);
+    }
   };
 
   return (

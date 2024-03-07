@@ -1,42 +1,22 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import axios from "axios";
+import myAxios from "../../utils/axios";
 
 export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // XSRF-TOKENの値をCookieから取得する関数
-  function getCookieValue(name) {
-    let matches = document.cookie.match(
-      new RegExp(
-        "(?:^|; )" +
-          name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1") +
-          "=([^;]*)"
-      )
-    );
-    return matches ? decodeURIComponent(matches[1]) : undefined;
-  }
-
   const performLogin = () => {
-    axios
-      .get("http://localhost/sanctum/csrf-cookie", { withCredentials: true })
+    myAxios
+      .get("http://localhost/sanctum/csrf-cookie")
       .then(() => {
-        return axios.post(
+        return myAxios.post(
           "http://localhost/login",
           {
             email: email,
             password: password,
           },
-          {
-            withCredentials: true,
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-              "X-XSRF-TOKEN": getCookieValue("XSRF-TOKEN"),
-            },
-          }
         );
       })
       .then((response) => {
