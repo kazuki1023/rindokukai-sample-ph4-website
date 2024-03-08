@@ -16,13 +16,11 @@ use App\Http\Controllers\API;
 */
 
 // 新規登録、ログイン
-// Route::post('/register', [AuthController::class, 'register']);
-// Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+  return $request->user();
+});
 
 Route::middleware('auth:sanctum')->group(function () {
-  // Route::get('/user', function (Request $request) {
-  //   return $request->user();
-  // });
   Route::get('/top', [API\TopController::class, 'index']);
   Route::get('/trending', [API\TrendingController::class, 'index']);
   Route::post('/search', [API\SearchController::class, 'index']);

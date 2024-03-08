@@ -1,44 +1,50 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { handleLogout } from "../../utils/authUtils";
+import { checkAuthentication, performLogout } from "../../utils/authUtils";
 
 export default function TopPage() {
+  const [user, setUser] = useState(null);
   const router = useRouter();
-  const [username, setUsername] = useState("");
 
   useEffect(() => {
-    // const name = localStorage.getItem("username");
-    // const token = localStorage.getItem("token");
+    const fetchUser = async () => {
+      const userData = await checkAuthentication();
+      setUser(userData);
+    };
 
-    // if (!token) {
-    //   router.push("/login");
-    // }
-
-    // setUsername(name);
+    fetchUser();
   }, []);
+
+  const handleLogout = async () => {
+    const result = await performLogout();
+    if (result) {
+      console.log("Redirecting to login page...");
+      router.push("/login");
+    } else {
+      console.error("Logout failed");
+      // 必要に応じてエラー処理をここに追加
+    }
+  };
 
   return (
     <main className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-4">
-        {username ? (
-          <div>
-            <p className="text-lg font-semibold text-white">
-              Welcome, {username}!
-            </p>
-            <button
-              className="text-blue-500 hover:underline cursor-pointer"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
-          </div>
-        ) : (
-          <Link href="/login" className="text-lg font-semibold text-white">
-            Login
-          </Link>
-        )}
-      </div>
+      <header className="flex justify-between p-4">
+        <div className="text-left">
+          {user && <p className="text-white">Welcome, {user.name}!</p>}
+        </div>
+        <div className="text-right">
+          {user ? (
+            <a className="text-white cursor-pointer" onClick={handleLogout}>
+              ログアウト
+            </a>
+          ) : (
+            <Link href="/login" className="text-white">
+              ログイン
+            </Link>
+          )}
+        </div>
+      </header>
       <section className="text-center">
         <h1 className="text-4xl font-bold mb-4 text-white">
           Welcome to (Service Name)
