@@ -23,7 +23,6 @@ export default function TopPage() {
       router.push("/login");
     } else {
       console.error("Logout failed");
-      // 必要に応じてエラー処理をここに追加
     }
   };
 
