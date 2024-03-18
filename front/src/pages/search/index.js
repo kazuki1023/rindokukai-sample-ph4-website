@@ -1,50 +1,52 @@
 import { useState, useEffect } from "react";
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 import Link from "next/link";
-import { useHandleLogout } from "../../utils/authUtils";
+import myAxios from "../../utils/axios";
+import { checkAuthentication, performLogout } from "../../utils/authUtils";
 
 export default function Search() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [user, setUser] = useState(null);
   const [youtubeData, setYoutubeData] = useState([]);
   const [spotifyData, setSpotifyData] = useState([]);
 
-  const handleSubmit = async (e, token) => {
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await checkAuthentication();
+      if (!userData) {
+        router.push("/login");
+      } else {
+        setUser(userData);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const handleLogout = async () => {
+    const result = await performLogout();
+    if (result) {
+      router.push("/login");
+    } else {
+      console.error("Logout failed");
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // CSRFトークンを取得
-    await fetch("http://localhost/sanctum/csrf-cookie", {
-      method: "GET",
-      credentials: "include",
-    });
-
-    // XSRF-TOKEN クッキーからトークン値を取得
-    const xsrfToken = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("XSRF-TOKEN="))
-      .split("=")[1];
+    await myAxios.get("http://localhost/sanctum/csrf-cookie");
 
     try {
       const formData = new FormData(e.target);
       const { q, maxResults } = Object.fromEntries(formData);
 
-      const response = await fetch("http://localhost/api/search", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": decodeURIComponent(xsrfToken),
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({ q, maxResults }),
+      const response = await myAxios.post("http://localhost/api/search", {
+        q,
+        maxResults,
       });
 
-      if (response.status === 401) {
-        router.push('/login');
-        return;
-      }
-
-      const data = await response.json();
+      const data = response.data;
       console.log(data);
 
       setYoutubeData(data.youtubeResults.items);
@@ -54,52 +56,24 @@ export default function Search() {
     }
   };
 
-  useEffect(() => {
-    const name = localStorage.getItem("username");
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      router.push('/login');
-      return;
-    }
-
-    // イベントハンドラにトークンを渡して handleSubmit を呼び出す
-    const formSubmitHandler = (e) => handleSubmit(e, token);
-
-    // フォームのイベントリスナーを設定
-    document
-      .getElementById("searchForm")
-      .addEventListener("submit", formSubmitHandler);
-
-    setUsername(name);
-
-    // コンポーネントがアンマウントされるときにイベントリスナーを削除
-    return () => {
-      document
-        .getElementById("searchForm")
-        .removeEventListener("submit", formSubmitHandler);
-    };
-  }, [setUsername]);
-
-  const handleLogout = useHandleLogout();
-
   return (
     <main className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-4">
-        {username ? (
-          <div>
-            <p className="text-lg font-semibold">Welcome, {username}!</p>
-            <button
-              className="text-blue-500 hover:underline cursor-pointer"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
-          </div>
-        ) : (
-          <Link href="/login" className="text-lg font-semibold"></Link>
-        )}
-      </div>
+      <header className="flex justify-between p-4">
+        <div className="text-left">
+          {user && <p className="text-white">Welcome, {user.name}!</p>}
+        </div>
+        <div className="text-right">
+          {user ? (
+            <a className="text-white cursor-pointer" onClick={handleLogout}>
+              ログアウト
+            </a>
+          ) : (
+            <Link href="/login" className="text-white">
+              ログイン
+            </Link>
+          )}
+        </div>
+      </header>
       <h1 className="text-3xl font-bold mb-4">Search Results</h1>
       <form id="searchForm" className="mb-8" onSubmit={handleSubmit}>
         <div className="flex flex-col lg:flex-row gap-2">

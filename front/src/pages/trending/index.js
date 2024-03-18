@@ -1,39 +1,44 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { useHandleLogout } from "../../utils/authUtils";
+import myAxios from "../../utils/axios";
+import { checkAuthentication, performLogout } from "../../utils/authUtils";
 
 export default function Trending() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [user, setUser] = useState(null);
   const [youtubeTrending, setTrendingYoutube] = useState([]);
   const [spotifyTrending, setTrendingSpotify] = useState([]);
 
   useEffect(() => {
-    const name = localStorage.getItem("username");
-    const token = localStorage.getItem("token");
+    const fetchUser = async () => {
+      const userData = await checkAuthentication();
+      if (!userData) {
+        router.push("/login");
+      } else {
+        setUser(userData);
+      }
+    };
+    fetchUser();
+  }, []);
 
-    if (!token) {
+  const handleLogout = async () => {
+    const result = await performLogout();
+    if (result) {
       router.push("/login");
-      return;
+    } else {
+      console.error("Logout failed");
     }
+  };
 
+  useEffect(() => {
     const fetchTrendingData = async () => {
       try {
-        const response = await fetch("http://localhost/api/trending", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        await myAxios.get("http://localhost/sanctum/csrf-cookie");
 
-        if (response.status === 401) {
-          router.push("/login");
-          return;
-        }
+        const response = await myAxios.get("http://localhost/api/trending");
 
-        const data = await response.json();
+        const data = response.data;
         console.log(data);
 
         setTrendingYoutube(data.youtubeTrending);
@@ -44,28 +49,26 @@ export default function Trending() {
     };
 
     fetchTrendingData();
-    setUsername(name);
-  }, []);
-
-  const handleLogout = useHandleLogout();
+  }, [user]); // userの変更を監視
 
   return (
     <main className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-4">
-        {username ? (
-          <div>
-            <p className="text-lg font-semibold">Welcome, {username}!</p>
-            <button
-              className="text-blue-500 hover:underline cursor-pointer"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
-          </div>
-        ) : (
-          <Link href="/login" className="text-lg font-semibold"></Link>
-        )}
-      </div>
+      <header className="flex justify-between p-4">
+        <div className="text-left">
+          {user && <p className="text-white">Welcome, {user.name}!</p>}
+        </div>
+        <div className="text-right">
+          {user ? (
+            <a className="text-white cursor-pointer" onClick={handleLogout}>
+              ログアウト
+            </a>
+          ) : (
+            <Link href="/login" className="text-white">
+              ログイン
+            </Link>
+          )}
+        </div>
+      </header>
       <h1 className="text-3xl font-bold mb-4">Trending Now:</h1>
       <div className="container mx-auto p-4 flex flex-col lg:flex-row">
         <div className="lg:w-1/3">

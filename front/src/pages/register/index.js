@@ -5,10 +5,10 @@ import myAxios from "../../utils/axios";
 export default function Register() {
   const router = useRouter();
   const [name, setName] = useState("");
-  const [conf_password, setPasswordConf] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [conf_password, setPasswordConf] = useState("");
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 

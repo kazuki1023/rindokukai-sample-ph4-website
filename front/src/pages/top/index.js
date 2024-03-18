@@ -4,8 +4,8 @@ import { useRouter } from "next/router";
 import { checkAuthentication, performLogout } from "../../utils/authUtils";
 
 export default function TopPage() {
-  const [user, setUser] = useState(null);
   const router = useRouter();
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -19,7 +19,6 @@ export default function TopPage() {
   const handleLogout = async () => {
     const result = await performLogout();
     if (result) {
-      console.log("Redirecting to login page...");
       router.push("/login");
     } else {
       console.error("Logout failed");
