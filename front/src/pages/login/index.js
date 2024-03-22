@@ -9,10 +9,10 @@ export default function Login() {
 
   const performLogin = () => {
     myAxios
-      .get("http://localhost/sanctum/csrf-cookie")
+      .get("/sanctum/csrf-cookie")
       .then(() => {
         return myAxios.post(
-          "http://localhost/login",
+          "/login",
           {
             email: email,
             password: password,

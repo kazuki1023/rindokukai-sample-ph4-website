@@ -14,10 +14,10 @@ export default function Register() {
 
     try {
       // CSRFトークンを取得するためのGETリクエスト
-      await myAxios.get("http://localhost/sanctum/csrf-cookie");
+      await myAxios.get("/sanctum/csrf-cookie");
 
       // ユーザー登録のPOSTリクエスト
-      const registrationResponse = await myAxios.post("http://localhost/register", {
+      const registrationResponse = await myAxios.post("/register", {
         name: name,
         email: email,
         password: password,

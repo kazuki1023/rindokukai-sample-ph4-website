@@ -34,9 +34,7 @@ export default function Trending() {
   useEffect(() => {
     const fetchTrendingData = async () => {
       try {
-        await myAxios.get("http://localhost/sanctum/csrf-cookie");
-
-        const response = await myAxios.get("http://localhost/api/trending");
+        const response = await myAxios.get("/api/trending");
 
         const data = response.data;
         console.log(data);

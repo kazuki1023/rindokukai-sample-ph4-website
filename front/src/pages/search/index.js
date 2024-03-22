@@ -34,14 +34,11 @@ export default function Search() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // CSRFトークンを取得
-    await myAxios.get("http://localhost/sanctum/csrf-cookie");
-
     try {
       const formData = new FormData(e.target);
       const { q, maxResults } = Object.fromEntries(formData);
 
-      const response = await myAxios.post("http://localhost/api/search", {
+      const response = await myAxios.post("/api/search", {
         q,
         maxResults,
       });

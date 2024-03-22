@@ -11,8 +11,7 @@ export const checkAuthentication = async () => {
 
 export const performLogout = async () => {
   try {
-    await myAxios.get("http://localhost/sanctum/csrf-cookie");
-    await myAxios.post("http://localhost/logout", { withCredentials: true });
+    await myAxios.post("/logout");
     console.log("Logout successful");
     return true; 
   } catch (error) {
