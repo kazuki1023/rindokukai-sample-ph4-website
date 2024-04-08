@@ -29,18 +29,12 @@ export default function TopPage() {
   return (
     <main className="container mx-auto p-4">
       <header className="flex justify-between p-4">
-        <div className="text-left">
-          {user && <p className="text-lg">Welcome, {user.name}!</p>}
+        <div className="text-left w-30">
+          <Image src="/images/logo.png" alt="Logo" width={50} height={50} />
         </div>
-        <Link href="/top" className="text-center">
-          <Image
-            src="/images/logo.png"
-            alt="Logo"
-            width={50}
-            height={50}
-          />
-        </Link>
+        <Link href="/top" className="text-center"></Link>
         <div className="text-right">
+          {user && <p>Welcome, {user.name}!</p>}
           {user ? (
             <button className="cursor-pointer" onClick={handleLogout}>
               ログアウト

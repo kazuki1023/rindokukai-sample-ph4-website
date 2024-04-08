@@ -53,22 +53,20 @@ export default function Trending() {
   return (
     <main className="container mx-auto p-4">
       <header className="flex justify-between p-4">
-        <div className="text-left">{user && <p>Welcome, {user.name}!</p>}</div>
-        <Link href="/top" className="text-center">
-          <Image
-            src="/images/logo.png"
-            alt="Logo"
-            width={50}
-            height={50}
-          />
-        </Link>
+        <div className="text-left w-30">
+          <Image src="/images/logo.png" alt="Logo" width={50} height={50} />
+        </div>
+        <Link href="/top" className="text-center"></Link>
         <div className="text-right">
+          {user && <p>Welcome, {user.name}!</p>}
           {user ? (
-            <a className="cursor-pointer" onClick={handleLogout}>
+            <button className="cursor-pointer" onClick={handleLogout}>
               ログアウト
-            </a>
+            </button>
           ) : (
-            <Link href="/login">ログイン</Link>
+            <Link href="/login">
+              <p className="cursor-pointer">ログイン</p>
+            </Link>
           )}
         </div>
       </header>
