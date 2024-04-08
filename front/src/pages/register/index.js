@@ -35,7 +35,7 @@ export default function Register() {
     <form onSubmit={handleSubmit} className="container mx-auto p-4 max-w-md">
       <div className="mb-4">
         <label htmlFor="name" className="block text-sm font-bold mb-2">
-          Name:
+          名前:
         </label>
         <input
           type="text"
@@ -47,7 +47,7 @@ export default function Register() {
       </div>
       <div className="mb-4">
         <label htmlFor="email" className="block text-sm font-bold mb-2">
-          Email:
+          メール:
         </label>
         <input
           type="email"
@@ -59,7 +59,7 @@ export default function Register() {
       </div>
       <div className="mb-4">
         <label htmlFor="password" className="block text-sm font-bold">
-          Password:
+          パスワード:
         </label>
         <input
           type="password"
@@ -71,7 +71,7 @@ export default function Register() {
       </div>
       <div className="mb-6">
         <label htmlFor="conf_password" className="block text-sm font-bold mb-2">
-          Confirm Password:
+          パスワード確認:
         </label>
         <input
           type="password"
@@ -84,9 +84,9 @@ export default function Register() {
       <div className="flex items-center justify-center">
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          className="text-white bg-blue-500 hover:bg-blue-700 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         >
-          Register
+          新規登録
         </button>
       </div>
     </form>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import Image from "next/image";
 import myAxios from "../../utils/axios";
 import { checkAuthentication, performLogout } from "../../utils/authUtils";
 
@@ -52,18 +53,22 @@ export default function Trending() {
   return (
     <main className="container mx-auto p-4">
       <header className="flex justify-between p-4">
-        <div className="text-left">
-          {user && <p className="text-white">Welcome, {user.name}!</p>}
-        </div>
+        <div className="text-left">{user && <p>Welcome, {user.name}!</p>}</div>
+        <Link href="/top" className="text-center">
+          <Image
+            src="/images/logo.png"
+            alt="Logo"
+            width={50}
+            height={50}
+          />
+        </Link>
         <div className="text-right">
           {user ? (
-            <a className="text-white cursor-pointer" onClick={handleLogout}>
+            <a className="cursor-pointer" onClick={handleLogout}>
               ログアウト
             </a>
           ) : (
-            <Link href="/login" className="text-white">
-              ログイン
-            </Link>
+            <Link href="/login">ログイン</Link>
           )}
         </div>
       </header>
