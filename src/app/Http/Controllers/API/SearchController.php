@@ -5,64 +5,34 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Google_Client;
 use Google_Service_YouTube;
+use App\Services\SpotifyService;
+use App\Services\YouTubeService;
 use SpotifyWebAPI\SpotifyWebAPI;
-use Illuminate\Http\Request;
+use App\Http\Requests\SearchRequest;
 use Illuminate\Support\Facades\Http;
 
 class SearchController extends Controller
 {
-    public function index(Request $request)
+    private $spotifyService;
+    private $youtubeService;
+
+    public function __construct(SpotifyService $spotifyService, YouTubeService $youtubeService)
     {
-        $limit = $request->input('maxResults');
-        $q = $request->input('q');
+        $this->spotifyService = $spotifyService;
+        $this->youtubeService = $youtubeService;
+    }
 
-        // YouTube Data API v3
-        $youtubeClient = new Google_Client();
-        $youtubeClient->setDeveloperKey(env('GOOGLE_DEVELOPER_KEY'));
+    public function index(SearchRequest $request)
+    {
+        $limit = $request->input('maxResults', 10);
+        $query = $request->input('q');
 
-        $youtubeService = new Google_Service_YouTube($youtubeClient);
-
-        $youtubeResponse = $youtubeService->search->listSearch('id, snippet', array(
-            'q' => $q,
-            'maxResults' => $limit,
-            'type' => 'video',
-        ));
-
-        // Spotify API
-        $clientId = env('SPOTIFY_CLIENT_ID');
-        $clientSecret = env('SPOTIFY_CLIENT_SECRET');
-
-        // Spotify API のアクセストークン取得エンドポイント
-        $tokenEndpoint = 'https://accounts.spotify.com/api/token';
-
-        // アクセストークンを取得するためのリクエスト
-        $response = Http::asForm()->post($tokenEndpoint, [
-            'grant_type' => 'client_credentials',
-            'client_id' => $clientId,
-            'client_secret' => $clientSecret,
-        ]);
-
-        // レスポンスからアクセストークンを取り出す
-        $data = $response->json();
-        $accessToken = $data['access_token'];
-
-        // Spotify API への検索リクエスト
-        $spotifyApi = new SpotifyWebAPI();
-        $spotifyApi->setAccessToken($accessToken);
-
-        $options = ([
-            'limit' => $limit,
-        ]);
-
-        $spotifyTracks = $spotifyApi->search(
-            $request->input('q'),
-            'track',
-            $options
-        );
+        $youtubeResults = $this->youtubeService->search($query, $limit);
+        $spotifyResults = $this->spotifyService->search($query, $limit);
 
         return response()->json([
-            'youtubeResults' => $youtubeResponse->toSimpleObject(),
-            'spotifyResults' => $spotifyTracks->tracks->items,
+            'youtubeResults' => $youtubeResults,
+            'spotifyResults' => $spotifyResults,
         ]);
     }
 }

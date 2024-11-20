@@ -31,4 +31,13 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'youtube' => [
+        'developer_key' => env('GOOGLE_DEVELOPER_KEY'),
+    ],
+    'spotify' => [
+        'client_id' => env('SPOTIFY_CLIENT_ID'),
+        'client_secret' => env('SPOTIFY_CLIENT_SECRET'),
+        'token_endpoint' => 'https://accounts.spotify.com/api/token',
+    ],
+
 ];
